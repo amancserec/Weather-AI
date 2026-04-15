@@ -74,4 +74,31 @@ This app is structured for Vercel deployment:
 3. Add the same environment variables
 4. Deploy
 
+## GitHub Deployment Readiness Checklist
+
+Before pushing this repository publicly:
+
+1. Confirm secrets are only in `.env.local` (never in tracked files).
+2. Verify `.env.local` is ignored by git (it is listed in `.gitignore`).
+3. Keep `.env.example` as placeholders only.
+4. Run local validation:
+
+```bash
+npm run typecheck
+npm run build
+```
+
+5. Push to GitHub. CI in `.github/workflows/ci.yml` will run typecheck + build on pushes and pull requests.
+
+For Vercel production deploys, set these environment variables in the Vercel project settings:
+
+- `ACCUWEATHER_API_KEY`
+- `GROQ_API_KEY`
+- `HINDSIGHT_API_KEY`
+- `HINDSIGHT_BANK_ID`
+- `HINDSIGHT_BASE_URL`
+- `GROQ_MODEL`
+- `DEFAULT_LOCATION`
+- `NEXT_PUBLIC_APP_NAME`
+
 See [docs/launch-checklist.md](docs/launch-checklist.md) and [docs/demo-script.md](docs/demo-script.md) for launch and demo preparation.

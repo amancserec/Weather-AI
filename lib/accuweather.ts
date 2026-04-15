@@ -7,6 +7,11 @@ type AccuWeatherLocation = {
   AdministrativeArea?: { LocalizedName?: string };
 };
 
+type Coordinates = {
+  latitude: number;
+  longitude: number;
+};
+
 type CurrentConditionsResponse = Array<{
   WeatherText: string;
   HasPrecipitation: boolean;
@@ -95,6 +100,21 @@ export async function searchLocation(query: string) {
   return location;
 }
 
+export async function searchLocationByCoordinates({ latitude, longitude }: Coordinates) {
+  const location = await accuweatherFetch<AccuWeatherLocation>(
+    "/locations/v1/cities/geoposition/search",
+    new URLSearchParams({
+      q: `${latitude},${longitude}`
+    })
+  );
+
+  if (!location?.Key) {
+    throw new Error("No AccuWeather location found for your current coordinates.");
+  }
+
+  return location;
+}
+
 export async function getCurrentConditions(locationKey: string) {
   const results = await accuweatherFetch<CurrentConditionsResponse>(
     `/currentconditions/v1/${locationKey}`,
@@ -117,8 +137,10 @@ export async function getDailyForecast(locationKey: string) {
   );
 }
 
-export async function getWeatherSnapshot(locationQuery: string) {
-  const location = await searchLocation(locationQuery);
+export async function getWeatherSnapshot(locationQuery: string, coordinates?: Coordinates) {
+  const location = coordinates
+    ? await searchLocationByCoordinates(coordinates)
+    : await searchLocation(locationQuery);
   const [current, forecast] = await Promise.all([
     getCurrentConditions(location.Key),
     getDailyForecast(location.Key)

@@ -11,6 +11,10 @@ type RequestMessage = {
 type AgentInput = {
   question: string;
   location?: string;
+  coordinates?: {
+    latitude: number;
+    longitude: number;
+  };
   memoryHint?: string;
   history: RequestMessage[];
 };
@@ -24,7 +28,7 @@ function formatHistory(history: RequestMessage[]) {
 
 export async function answerWeatherQuestion(input: AgentInput) {
   const location = input.location || env.DEFAULT_LOCATION;
-  const weather = await getWeatherSnapshot(location);
+  const weather = await getWeatherSnapshot(location, input.coordinates);
   const weatherBrief = formatWeatherSnapshot(weather);
 
   const recallQuery = [input.memoryHint, input.question, location].filter(Boolean).join(" | ");

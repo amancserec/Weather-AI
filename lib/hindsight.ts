@@ -73,14 +73,19 @@ export async function retainMemory(content: string) {
     return;
   }
 
-  await ensureBank();
+  try {
+    await ensureBank();
 
-  await hindsightFetch(`/v1/default/banks/${env.HINDSIGHT_BANK_ID}/memories`, {
-    method: "POST",
-    body: JSON.stringify({
-      items: [{ content }]
-    })
-  });
+    await hindsightFetch(`/v1/default/banks/${env.HINDSIGHT_BANK_ID}/memories`, {
+      method: "POST",
+      body: JSON.stringify({
+        items: [{ content }]
+      })
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown Hindsight retain error";
+    console.warn(`[Hindsight] retain skipped: ${message}`);
+  }
 }
 
 export async function recallMemories(query: string) {
@@ -88,22 +93,28 @@ export async function recallMemories(query: string) {
     return [];
   }
 
-  await ensureBank();
+  try {
+    await ensureBank();
 
-  const response = await hindsightFetch(
-    `/v1/default/banks/${env.HINDSIGHT_BANK_ID}/memories/recall`,
-    {
-      method: "POST",
-      body: JSON.stringify({
-        query
-      })
-    }
-  );
+    const response = await hindsightFetch(
+      `/v1/default/banks/${env.HINDSIGHT_BANK_ID}/memories/recall`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          query
+        })
+      }
+    );
 
-  const data = (await response.json()) as RecallResult;
+    const data = (await response.json()) as RecallResult;
 
-  return (data.results ?? [])
-    .map((result) => result.text ?? result.content ?? "")
-    .filter(Boolean)
-    .slice(0, 6);
+    return (data.results ?? [])
+      .map((result) => result.text ?? result.content ?? "")
+      .filter(Boolean)
+      .slice(0, 6);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown Hindsight recall error";
+    console.warn(`[Hindsight] recall skipped: ${message}`);
+    return [];
+  }
 }

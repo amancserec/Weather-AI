@@ -6,6 +6,6 @@ export const env = {
   HINDSIGHT_BASE_URL:
     process.env.HINDSIGHT_BASE_URL?.trim() || "https://api.hindsight.vectorize.io",
   GROQ_MODEL: process.env.GROQ_MODEL?.trim() || "llama-3.3-70b-versatile",
-  DEFAULT_LOCATION: process.env.DEFAULT_LOCATION?.trim() || "New Delhi",
+  DEFAULT_LOCATION: process.env.DEFAULT_LOCATION?.trim() ?? "",
   NEXT_PUBLIC_APP_NAME: process.env.NEXT_PUBLIC_APP_NAME?.trim() || "Weather AI"
 };

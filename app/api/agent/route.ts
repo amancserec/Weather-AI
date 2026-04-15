@@ -11,6 +11,8 @@ export async function POST(request: NextRequest) {
     const body = (await request.json()) as {
       question?: string;
       location?: string;
+      latitude?: number;
+      longitude?: number;
       memoryHint?: string;
       history?: RequestMessage[];
     };
@@ -27,6 +29,10 @@ export async function POST(request: NextRequest) {
     const answer = await answerWeatherQuestion({
       question: body.question.trim(),
       location: body.location?.trim(),
+      coordinates:
+        typeof body.latitude === "number" && typeof body.longitude === "number"
+          ? { latitude: body.latitude, longitude: body.longitude }
+          : undefined,
       memoryHint: body.memoryHint?.trim(),
       history: Array.isArray(body.history) ? body.history : []
     });
